@@ -18,16 +18,22 @@ namespace AiPrReviewer.Controllers
             _audit = audit;
         }
 
+        //List PRs for a repo
         public async Task<IActionResult> Index(string owner, string repo)
         {
             var prs = await _gitHub.GetPullRequests(owner, repo);
+            ViewBag.Owner = owner;
             ViewBag.Repo = repo;
             return View(prs);
         }
-        public async Task<IActionResult> Details(int id)
+
+        // Show PR details for a repo
+        public async Task<IActionResult> Details(string owner, string repo, int id)
         {
-            var comments = await _gitHub.GetPullRequestDetails("EduartHajko", "InnovationPlatform", id);
+            var comments = await _gitHub.GetPullRequestDetails(owner, repo, id);
             ViewBag.PrNumber = id;
+            ViewBag.Owner = owner;
+            ViewBag.Repo = repo;
             return View(comments);
         }
 
@@ -36,7 +42,7 @@ namespace AiPrReviewer.Controllers
         {
             try
             {
-                var code = await _gitHub.GetFileContent("EduartHajko", "InnovationPlatform", req.FilePath, req.PrNumber);
+                var code = await _gitHub.GetFileContent(req.Owner, req.Repo, req.FilePath, req.PrNumber);
                 var fix = await _ai.SolveComment(req.Comment, code);
                 return Json(new { suggestion = fix });
             }
@@ -50,8 +56,8 @@ namespace AiPrReviewer.Controllers
         public async Task<IActionResult> CommitFix([FromBody] CommitRequest req)
         {
             var sha = await _gitHub.CommitFix(
-                "EduartHajko",
-                "InnovationPlatform",
+                req.Owner,
+                req.Repo,
                 req.PrNumber,
                 req.FilePath,
                 req.FixedCode,
@@ -69,7 +75,8 @@ namespace AiPrReviewer.Controllers
         }
     }
 
-    public record SolveRequest(int PrNumber, string FilePath, string Comment);
-    public record CommitRequest(int PrNumber, string FilePath, string FixedCode, string Comment);
+    public record SolveRequest(string Owner, string Repo, int PrNumber, string FilePath, string Comment);
+    public record CommitRequest(string Owner, string Repo, int PrNumber, string FilePath, string FixedCode, string Comment);
+
 
 }

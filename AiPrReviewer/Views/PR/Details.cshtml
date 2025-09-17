@@ -1,4 +1,8 @@
 ﻿@model PullRequestDetailsDto
+@{
+    var owner = ViewBag.Owner as string;
+    var repo = ViewBag.Repo as string;
+}
 
 <h2>Pull Request #@Model.Number - @Model.Title</h2>
 <p>
@@ -21,7 +25,6 @@
                 @if (!string.IsNullOrEmpty(comment.FilePath))
                 {
                     <br />
-        
                     <code>@comment.FilePath</code>
                 }
             </p>
@@ -105,7 +108,13 @@ else
                 const res = await fetch('/PR/SolveComment', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prNumber: pr, filePath: file, comment: comment })
+                    body: JSON.stringify({
+                        owner: "@owner",
+                        repo: "@repo",
+                        prNumber: pr,
+                        filePath: file,
+                        comment: comment
+                    })
                 });
 
                 const data = await res.json();
@@ -121,6 +130,8 @@ else
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
+                            owner: "@owner",
+                            repo: "@repo",
                             prNumber: pr,
                             filePath: file,
                             fixedCode: sanitizeCode(data.suggestion),

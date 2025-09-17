@@ -1,16 +1,19 @@
 ﻿@model IReadOnlyList<Octokit.PullRequest>
+@{
+    var owner = ViewBag.Owner as string;
+    var repo = ViewBag.Repo as string;
+}
 
-<h2>Pull Requests</h2>
+<h2>Pull Requests for @owner/@repo</h2>
 
-<table class="table table-striped table-bordered">
-    <thead class="table-dark">
+<table class="table table-bordered">
+    <thead>
         <tr>
             <th>#</th>
             <th>Title</th>
             <th>Author</th>
-            <th>Status</th>
             <th>Created</th>
-            <th>Actions</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -20,10 +23,13 @@
                 <td>@pr.Number</td>
                 <td>@pr.Title</td>
                 <td>@pr.User.Login</td>
-                <td>@pr.State.StringValue</td>
-                <td>@pr.CreatedAt.ToLocalTime()</td>
+                <td>@pr.CreatedAt.ToString("g")</td>
                 <td>
-                    <a asp-controller="PR" asp-action="Details" asp-route-id="@pr.Number"
+                    <a asp-controller="PR"
+                       asp-action="Details"
+                       asp-route-owner="@owner"
+                       asp-route-repo="@repo"
+                       asp-route-id="@pr.Number"
                        class="btn btn-sm btn-primary">
                         View Details
                     </a>
