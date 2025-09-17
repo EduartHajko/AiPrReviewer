@@ -1,0 +1,34 @@
+﻿@model IReadOnlyList<Octokit.Repository>
+
+<h2>Repositories</h2>
+
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Language</th>
+            <th>Updated</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var repo in Model)
+        {
+            <tr>
+                <td>@repo.Name</td>
+                <td>@repo.Description</td>
+                <td>@repo.Language</td>
+                <td>@repo.UpdatedAt.ToLocalTime()</td>
+                <td>
+                    <a asp-controller="PR" asp-action="Index"
+                       asp-route-owner="@repo.Owner.Login"
+                       asp-route-repo="@repo.Name"
+                       class="btn btn-sm btn-primary">
+                        Show PRs
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,136 @@
+﻿@model PullRequestDetailsDto
+
+<h2>Pull Request #@Model.Number - @Model.Title</h2>
+<p>
+    <b>Author:</b> @Model.Author |
+    <b>Created:</b> @Model.CreatedAt |
+    <b>Status:</b> @Model.State
+</p>
+<p>@Model.Body</p>
+
+<hr />
+
+<h3>Review Comments</h3>
+@if (Model.ReviewComments != null && Model.ReviewComments.Any())
+{
+    foreach (var comment in Model.ReviewComments)
+    {
+        <div class="comment border rounded p-3 mb-3 bg-light">
+            <p>
+                <b>@comment.User</b> (@comment.CreatedAt.ToString("g")):
+                @if (!string.IsNullOrEmpty(comment.FilePath))
+                {
+                    <br />
+        
+                    <code>@comment.FilePath</code>
+                }
+            </p>
+
+            <blockquote class="blockquote">@comment.Body</blockquote>
+
+            <button class="solve-btn btn btn-sm btn-outline-primary"
+                    data-pr="@Model.Number"
+                    data-file="@comment.FilePath"
+                    data-comment="@comment.Body">
+                🤖 Solve with AI
+            </button>
+
+            <pre class="ai-response mt-2 bg-white p-2 border"
+                 style="white-space: pre-wrap; display:none;"></pre>
+
+            <button class="commit-btn btn btn-sm btn-success mt-2" style="display:none;">
+                ✅ Commit Fix
+            </button>
+        </div>
+    }
+}
+else
+{
+    <p>No review comments found.</p>
+}
+
+<hr />
+
+<h3>General Comments</h3>
+@if (Model.Comments != null && Model.Comments.Any())
+{
+    <ul class="list-group">
+        @foreach (var comment in Model.Comments)
+        {
+            <li class="list-group-item">
+                <b>@comment.User</b> (@comment.CreatedAt.ToString("g")): @comment.Body
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No general comments.</p>
+}
+
+<hr />
+
+<h3>Commits</h3>
+@if (Model.Commits != null && Model.Commits.Any())
+{
+    <ul class="list-group">
+        @foreach (var commit in Model.Commits)
+        {
+            <li class="list-group-item">
+                <code>@(commit.Sha?.Substring(0, Math.Min(commit.Sha.Length, 7)))</code>
+                - @commit.Message
+                <small>(by @commit.Author on @commit.Date.ToString("g"))</small>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No commits found.</p>
+}
+
+@section Scripts {
+    <script>
+        function sanitizeCode(text) {
+            if (!text) return "⚠️ No suggestion returned.";
+            return text.replace(/```[\s\S]*?```/g, m => m.replace(/```(\w+)?/g, '').trim());
+        }
+
+        document.querySelectorAll('.solve-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const pr = btn.getAttribute("data-pr");
+                const file = btn.getAttribute("data-file") || "";
+                const comment = btn.getAttribute("data-comment") || "";
+
+                const res = await fetch('/PR/SolveComment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prNumber: pr, filePath: file, comment: comment })
+                });
+
+                const data = await res.json();
+                const responseBox = btn.parentElement.querySelector('.ai-response');
+                responseBox.textContent = sanitizeCode(data.suggestion);
+                responseBox.style.display = "block";
+
+                const commitBtn = btn.parentElement.querySelector('.commit-btn');
+                commitBtn.style.display = "inline-block";
+
+                commitBtn.onclick = async () => {
+                    const commitRes = await fetch('/PR/CommitFix', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            prNumber: pr,
+                            filePath: file,
+                            fixedCode: sanitizeCode(data.suggestion),
+                            comment: comment
+                        })
+                    });
+                    const commitData = await commitRes.json();
+                    alert("✅ Committed! SHA: " + commitData.commitSha);
+                };
+            });
+        });
+    </script>
+}

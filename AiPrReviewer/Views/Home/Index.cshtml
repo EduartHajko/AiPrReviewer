@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "AiPrReviewer Dashboard";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">👋 Welcome to AiPrReviewer</h1>
+        <p class="lead text-muted">
+            Your AI-powered assistant for reviewing, fixing, and managing GitHub Pull Requests.
+        </p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100 border-primary text-center">
+                <div class="card-body">
+                    <h5 class="card-title">📂 Repositories</h5>
+                    <p class="card-text text-muted">Browse all your repositories and select one to review.</p>
+                    <a asp-controller="Repository" asp-action="Index" class="btn btn-primary">
+                        View Repositories
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100 border-info text-center">
+                <div class="card-body">
+                    <h5 class="card-title">📝 Audit Log</h5>
+                    <p class="card-text text-muted">Check history of AI fixes and commits applied to PRs.</p>
+                    <a asp-controller="PR" asp-action="AuditLog" class="btn btn-info">
+                        View Audit Log
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

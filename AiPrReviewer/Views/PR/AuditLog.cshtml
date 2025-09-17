@@ -1,0 +1,22 @@
+﻿@model IEnumerable<AuditLog>
+
+<h2>AI Fix Audit Log</h2>
+<table class="table">
+    <tr>
+        <th>PR</th>
+        <th>File</th>
+        <th>Comment</th>
+        <th>Commit SHA</th>
+        <th>Timestamp</th>
+    </tr>
+    @foreach (var log in Model)
+    {
+        <tr>
+            <td>@log.PrNumber</td>
+            <td>@log.FilePath</td>
+            <td>@log.Comment</td>
+            <td><code>@log.CommitSha</code></td>
+            <td>@log.Timestamp</td>
+        </tr>
+    }
+</table>
