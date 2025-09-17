@@ -5,26 +5,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services
 builder.Services.AddControllersWithViews();
-builder.Services.Configure<GitHubOptions>(builder.Configuration.GetSection("GitHub"));
-builder.Services.Configure<OpenAIOptions>(builder.Configuration.GetSection("OpenAI"));
-
-
-builder.Services.AddScoped<GitHubService>(sp =>
+// Bind GitHub options
+builder.Services.Configure<GitHubOptions>(options =>
 {
-    var options = sp.GetRequiredService<
-        Microsoft.Extensions.Options.IOptions<GitHubOptions>>().Value;
-    return new GitHubService(options.Token); 
+    builder.Configuration.GetSection("GitHub").Bind(options);
 });
+// Load tokens (from User Secrets or env variables)
+var githubToken = builder.Configuration["GitHub:Token"];
+var openAiKey = builder.Configuration["OpenAI:ApiKey"];
 
-builder.Services.AddScoped<AiService>(sp =>
-{
-    var options = sp.GetRequiredService<
-        Microsoft.Extensions.Options.IOptions<OpenAIOptions>>().Value;
-    return new AiService(options.ApiKey);
-});
-builder.Services.AddScoped<AuditService>();
+builder.Services.AddSingleton(new GitHubService(githubToken));
+builder.Services.AddSingleton(new AiService(openAiKey));
+builder.Services.AddSingleton<AuditService>();
 
 var app = builder.Build();
-
+// Enable serving static files (css, js, images, bootstrap, etc.)
+app.UseStaticFiles();
 app.MapDefaultControllerRoute();
 app.Run();
