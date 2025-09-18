@@ -1,4 +1,5 @@
-﻿@model PullRequestDetailsDto
+﻿@await Html.PartialAsync("_NavMenu")
+@model PullRequestDetailsDto
 @{
     var owner = ViewBag.Owner as string;
     var repo = ViewBag.Repo as string;

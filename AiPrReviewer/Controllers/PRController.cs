@@ -21,6 +21,7 @@ namespace AiPrReviewer.Controllers
         //List PRs for a repo
         public async Task<IActionResult> Index(string owner, string repo)
         {
+            ViewData["ActiveTab"] = "PRs";
             var prs = await _gitHub.GetPullRequests(owner, repo);
             ViewBag.Owner = owner;
             ViewBag.Repo = repo;
@@ -30,6 +31,8 @@ namespace AiPrReviewer.Controllers
         // Show PR details for a repo
         public async Task<IActionResult> Details(string owner, string repo, int id)
         {
+            ViewData["ActiveTab"] = "PRs";
+
             var comments = await _gitHub.GetPullRequestDetails(owner, repo, id);
             ViewBag.PrNumber = id;
             ViewBag.Owner = owner;
@@ -78,6 +81,8 @@ namespace AiPrReviewer.Controllers
 
         public IActionResult AuditLog()
         {
+            ViewData["ActiveTab"] = "Audit";
+
             return View(_audit.GetAll());
         }
     }

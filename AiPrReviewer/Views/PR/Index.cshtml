@@ -1,4 +1,5 @@
-﻿@model IReadOnlyList<Octokit.PullRequest>
+﻿@await Html.PartialAsync("_NavMenu")
+@model IReadOnlyList<Octokit.PullRequest>
 @{
     var owner = ViewBag.Owner as string;
     var repo = ViewBag.Repo as string;
