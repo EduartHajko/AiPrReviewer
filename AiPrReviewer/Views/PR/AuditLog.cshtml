@@ -1,24 +1,29 @@
 ﻿@await Html.PartialAsync("_NavMenu")
 
-@model IEnumerable<AuditLog>
+@model IEnumerable<AuditLogEntry>
 
 <h2>AI Fix Audit Log</h2>
 <table class="table">
     <tr>
         <th>PR</th>
+        <th>ID</th>
         <th>File</th>
         <th>Comment</th>
+        <th>Author</th>
         <th>Commit SHA</th>
         <th>Timestamp</th>
     </tr>
     @foreach (var log in Model)
     {
         <tr>
+            <td>@log.PrTitle</td>
             <td>@log.PrNumber</td>
             <td>@log.FilePath</td>
             <td>@log.Comment</td>
+            <td>@log.Committer</td>
             <td><code>@log.CommitSha</code></td>
-            <td>@log.Timestamp</td>
+            <td>@log.CreatedAt</td>
+            
         </tr>
     }
 </table>

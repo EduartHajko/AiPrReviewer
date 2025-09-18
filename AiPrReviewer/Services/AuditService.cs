@@ -1,23 +1,41 @@
-﻿using AiPrReviewer.Models;
+﻿using AiPrReviewer.Data;
+using AiPrReviewer.Models;
+using System;
 
 namespace AiPrReviewer.Services
 {
     public class AuditService
     {
-        private readonly List<AuditLog> _logs = new();
+        private readonly AppDbContext _context;
 
-        public void Add(string comment, string filePath, int prNumber, string sha)
+        public AuditService(AppDbContext context)
         {
-            _logs.Add(new AuditLog
+            _context = context;
+        }
+
+        public void Add(string comment, string filePath, int prNumber, string commitSha, string committer, string prTitle)
+        {
+            var entry = new AuditLogEntry
             {
                 Comment = comment,
                 FilePath = filePath,
                 PrNumber = prNumber,
-                CommitSha = sha
-            });
+                CommitSha = commitSha,
+                Committer = committer,
+                PrTitle = prTitle,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.AuditLogs.Add(entry);
+            _context.SaveChanges();
         }
 
-        public IEnumerable<AuditLog> GetAll() => _logs.OrderByDescending(l => l.Timestamp);
+        public IEnumerable<AuditLogEntry> GetAll()
+        {
+            return _context.AuditLogs
+                           .OrderByDescending(a => a.CreatedAt)
+                           .ToList();
+        }
     }
-
 }
+

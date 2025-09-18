@@ -136,7 +136,8 @@ else
                             prNumber: pr,
                             filePath: file,
                             fixedCode: sanitizeCode(data.suggestion),
-                            comment: comment
+                            comment: comment,
+                            prTitle: "@Model.Title"
                         })
                     });
                     const commitData = await commitRes.json();

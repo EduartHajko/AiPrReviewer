@@ -74,7 +74,7 @@ namespace AiPrReviewer.Controllers
                 "AI: Applied reviewer fix"
             );
 
-            _audit.Add(req.Comment, req.FilePath, req.PrNumber, sha);
+            _audit.Add(req.Comment, req.FilePath, req.PrNumber, sha, req.Owner, req.PrTitle);
 
             return Json(new { status = "success", commitSha = sha });
         }
@@ -88,7 +88,7 @@ namespace AiPrReviewer.Controllers
     }
 
     public record SolveRequest(string Owner, string Repo, int PrNumber, string FilePath, string Comment);
-    public record CommitRequest(string Owner, string Repo, int PrNumber, string FilePath, string FixedCode, string Comment);
+    public record CommitRequest(string Owner, string Repo, int PrNumber, string FilePath, string FixedCode, string Comment,string PrTitle);
 
 
 }
