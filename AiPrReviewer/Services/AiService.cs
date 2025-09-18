@@ -15,26 +15,28 @@ namespace AiPrReviewer.Services
         public async Task<string> SolveComment(string comment, string code)
         {
             var prompt = $"""
-                Reviewer comment: {comment}
+        Reviewer comment: {comment}
 
-                Code snippet:
-                ```
-                {code}
-                ```
+        Original code snippet:
+        ```
+        {code}
+        ```
 
-                Please fix the code according to the reviewer’s comment.
-                Return only the corrected code snippet.
-                """;
+        ✅ Task: Apply ONLY the requested fix.
+        ⚠️ Output rules:
+        - Return ONLY the exact line(s) that must be changed or added.
+        - Do NOT repeat the full method or unrelated code.
+        - If no change is needed, reply with "NO CHANGE".
+        """;
 
-            // Call OpenAI using CompleteChatAsync
             var response = await _chatClient.CompleteChatAsync(
-                                   [
-                                    ChatMessage.CreateUserMessage(prompt)
-                                   ]
-                               );
+                [
+                    ChatMessage.CreateUserMessage(prompt)
+                ]
+            );
 
-            //Extract the message text
-            return response.Value.Content[0].Text;
+            return response.Value.Content[0].Text.Trim();
         }
+
     }
 }
