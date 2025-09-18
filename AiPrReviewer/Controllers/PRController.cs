@@ -42,7 +42,13 @@ namespace AiPrReviewer.Controllers
         {
             try
             {
-                var code = await _gitHub.GetFileContent(req.Owner, req.Repo, req.FilePath, req.PrNumber);
+                string code = string.Empty;
+
+                if (!string.IsNullOrEmpty(req.FilePath))
+                {
+                    code = await _gitHub.GetFileContent(req.Owner, req.Repo, req.FilePath, req.PrNumber);
+                }
+
                 var fix = await _ai.SolveComment(req.Comment, code);
                 return Json(new { suggestion = fix });
             }
@@ -51,6 +57,7 @@ namespace AiPrReviewer.Controllers
                 return Json(new { error = ex.Message });
             }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> CommitFix([FromBody] CommitRequest req)

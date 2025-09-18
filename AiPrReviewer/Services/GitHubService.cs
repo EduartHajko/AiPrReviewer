@@ -33,13 +33,13 @@ namespace AiPrReviewer.Services
         {
             var pr = await _client.PullRequest.Get(owner, repo, prNumber);
 
-            // Get issue comments
+            // Issue-level comments (PR discussion)
             var issueComments = await _client.Issue.Comment.GetAllForIssue(owner, repo, prNumber);
 
-            // Get review summaries (Approve / Request Changes / Comment)
+            // Review summaries (approve / request changes / comment) - no file path here
             var reviews = await _client.PullRequest.Review.GetAll(owner, repo, prNumber);
 
-            var reviewComments = reviews
+            var reviewSummaries = reviews
                 .Where(r => !string.IsNullOrEmpty(r.Body))
                 .Select(r => new CommentDto
                 {
@@ -50,16 +50,30 @@ namespace AiPrReviewer.Services
                 })
                 .ToList();
 
-            //  Merge all comments
+            // Inline review comments (with file paths)
+            var reviewComments = await _client.PullRequest.ReviewComment.GetAll(owner, repo, prNumber);
+
+            var inlineComments = reviewComments.Select(c => new CommentDto
+            {
+                User = c.User.Login,
+                Body = c.Body,
+                CreatedAt = c.CreatedAt.DateTime,
+                FilePath = c.Path //  this has the file path
+            }).ToList();
+
+            // Merge all comments together
             var allComments = issueComments.Select(c => new CommentDto
             {
                 User = c.User.Login,
                 Body = c.Body,
                 CreatedAt = c.CreatedAt.DateTime,
                 FilePath = null
-            }).Concat(reviewComments).ToList();
+            })
+            .Concat(reviewSummaries)
+            .Concat(inlineComments)
+            .ToList();
 
-            // Get commits
+            // Commits
             var commits = await _client.PullRequest.Commits(owner, repo, prNumber);
 
             return new PullRequestDetailsDto
@@ -70,8 +84,11 @@ namespace AiPrReviewer.Services
                 State = pr.State.StringValue,
                 Author = pr.User.Login,
                 CreatedAt = pr.CreatedAt.DateTime,
-                Comments = allComments ?? new List<CommentDto>(),      
-                ReviewComments = reviewComments ?? new List<CommentDto>(), 
+
+                // Separate them for UI
+                Comments = allComments ?? new List<CommentDto>(),
+                ReviewComments = inlineComments ?? new List<CommentDto>(),
+
                 Commits = commits.Select(c => new CommitDto
                 {
                     Sha = c.Sha,
@@ -86,9 +103,17 @@ namespace AiPrReviewer.Services
 
         public async Task<string> GetFileContent(string owner, string repo, string path, int prNumber)
         {
-            var file = await _client.Repository.Content.GetAllContentsByRef(owner, repo, path, $"refs/pull/{prNumber}/head");
-            return file[0].Content;
+            var file = await _client.Repository.Content.GetAllContents(owner, repo, path);
+
+            if (file == null || file.Count == 0)
+                throw new FileNotFoundException($"File {path} not found in PR {prNumber}");
+
+            var content = file[0];
+
+            return content.Content;
         }
+
+
 
         public async Task<string> CommitFix(string owner, string repo, int prNumber, string path, string fixedCode, string commitMessage)
         {

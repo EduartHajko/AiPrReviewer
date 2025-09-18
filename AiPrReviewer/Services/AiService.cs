@@ -26,14 +26,14 @@ namespace AiPrReviewer.Services
                 Return only the corrected code snippet.
                 """;
 
-            // ✅ Call OpenAI using CompleteChatAsync
+            // Call OpenAI using CompleteChatAsync
             var response = await _chatClient.CompleteChatAsync(
                                    [
                                     ChatMessage.CreateUserMessage(prompt)
                                    ]
                                );
 
-            // ✅ Extract the message text
+            //Extract the message text
             return response.Value.Content[0].Text;
         }
     }
