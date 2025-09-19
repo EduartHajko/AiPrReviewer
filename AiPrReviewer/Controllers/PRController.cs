@@ -74,16 +74,17 @@ namespace AiPrReviewer.Controllers
                 "AI: Applied reviewer fix"
             );
 
-            _audit.Add(req.Comment, req.FilePath, req.PrNumber, sha, req.Owner, req.PrTitle);
+            _audit.Add(req.Comment, req.FilePath, req.PrNumber, sha, req.Owner, req.PrTitle, req.FixedCode);
 
             return Json(new { status = "success", commitSha = sha });
         }
 
-        public IActionResult AuditLog()
+        public IActionResult AuditLog(int page = 1)
         {
             ViewData["ActiveTab"] = "Audit";
 
-            return View(_audit.GetAll());
+            var pagedResult = _audit.GetPaged(page, 10); // 10 rows per page
+            return View(pagedResult);
         }
     }
 

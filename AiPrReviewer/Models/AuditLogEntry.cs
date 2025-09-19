@@ -9,6 +9,7 @@
         public string CommitSha { get; set; } = string.Empty;
         public string Committer { get; set; } = string.Empty;
         public string PrTitle { get; set; } = string.Empty;
+        public string CodeSnippet { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

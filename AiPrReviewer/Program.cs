@@ -23,6 +23,13 @@ builder.Services.AddSingleton(new AiService(openAiKey));
 builder.Services.AddScoped<AuditService>();
 
 var app = builder.Build();
+// Seed initial data    
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated(); // create DB if missing
+    DataSeeder.SeedAuditLogs(db);
+}
 // Enable serving static files (css, js, images, bootstrap, etc.)
 app.UseStaticFiles();
 app.MapDefaultControllerRoute();

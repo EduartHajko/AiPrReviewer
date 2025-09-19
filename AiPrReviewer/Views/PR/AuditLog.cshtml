@@ -1,29 +1,57 @@
-﻿@await Html.PartialAsync("_NavMenu")
+﻿@using AiPrReviewer.Helpers
+@await Html.PartialAsync("_NavMenu")
 
-@model IEnumerable<AuditLogEntry>
+@model PagedResult<AuditLogEntry>
 
 <h2>AI Fix Audit Log</h2>
-<table class="table">
-    <tr>
-        <th>PR</th>
-        <th>ID</th>
-        <th>File</th>
-        <th>Comment</th>
-        <th>Author</th>
-        <th>Commit SHA</th>
-        <th>Timestamp</th>
-    </tr>
-    @foreach (var log in Model)
-    {
+<table class="table table-striped">
+    <thead>
         <tr>
-            <td>@log.PrTitle</td>
-            <td>@log.PrNumber</td>
-            <td>@log.FilePath</td>
-            <td>@log.Comment</td>
-            <td>@log.Committer</td>
-            <td><code>@log.CommitSha</code></td>
-            <td>@log.CreatedAt</td>
-            
+            <th>PR</th>
+            <th>ID</th>
+            <th>File</th>
+            <th>Comment</th>
+            <th>Author</th>
+            <th>Code Snippet</th>
+            <th>Commit SHA</th>
+            <th>Timestamp</th>
         </tr>
-    }
+    </thead>
+    <tbody>
+        @foreach (var log in Model.Items)
+        {
+            <tr>
+                <td>@log.PrTitle</td>
+                <td>@log.PrNumber</td>
+                <td>@log.FilePath</td>
+                <td>@log.Comment</td>
+                <td>@log.Committer</td>
+                <td>
+                    <pre style="white-space: pre-wrap;">@log.CodeSnippet</pre>
+                </td>
+                <td><code>@log.CommitSha</code></td>
+                <td>@log.CreatedAt.ToString("g")</td>
+            </tr>
+        }
+    </tbody>
 </table>
+
+<!-- Pagination controls -->
+<nav aria-label="Audit log pagination">
+    <ul class="pagination">
+        <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+            <a class="page-link" asp-action="AuditLog" asp-route-page="@(Model.Page - 1)">Previous</a>
+        </li>
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.Page ? "active" : "")">
+                <a class="page-link" asp-action="AuditLog" asp-route-page="@i">@i</a>
+            </li>
+        }
+
+        <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" asp-action="AuditLog" asp-route-page="@(Model.Page + 1)">Next</a>
+        </li>
+    </ul>
+</nav>
