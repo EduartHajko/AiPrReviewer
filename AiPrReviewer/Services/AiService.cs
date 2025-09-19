@@ -38,5 +38,16 @@ namespace AiPrReviewer.Services
             return response.Value.Content[0].Text.Trim();
         }
 
+        public async Task<string> GetPerformanceAnalysis(string prompt)
+        {
+            var response = await _chatClient.CompleteChatAsync(
+                [
+                    ChatMessage.CreateUserMessage(prompt)
+                ]
+            );
+            return response.Value.Content[0].Text;
+        }
+
+
     }
 }

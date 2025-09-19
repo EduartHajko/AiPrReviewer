@@ -47,6 +47,11 @@ namespace AiPrReviewer.Services
                 PageSize = pageSize
             };
         }
+
+        public IEnumerable<AuditLogEntry> GetAll()
+        {
+            return _context.AuditLogs.OrderByDescending(x => x.CreatedAt).ToList();
+        }
     }
 }
 

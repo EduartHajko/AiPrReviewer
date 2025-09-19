@@ -1,0 +1,16 @@
+﻿@await Html.PartialAsync("_NavMenu")
+@{
+    var author = ViewBag.Author as string;
+    var analysis = ViewBag.Analysis as string;
+}
+
+<div class="container mt-4">
+    <h2>📊 Performance Report for @author</h2>
+    <pre class="p-3 border bg-light" style="white-space: pre-wrap;">@analysis</pre>
+
+    <form asp-action="ExportToPdf" method="post">
+        <input type="hidden" name="author" value="@author" />
+        <input type="hidden" name="analysis" value="@analysis" />
+        <button type="submit" class="btn btn-success">📄 Download as PDF</button>
+    </form>
+</div>
