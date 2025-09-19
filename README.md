@@ -42,7 +42,16 @@ Audit logs are stored in a **local SQLite database** for full traceability.
   - GitHub API (via Octokit)  
   - OpenAI API (via OpenAI .NET client)  
 
----
+## 📦 Dependencies
+
+This project relies on the following NuGet packages:
+
+- **Microsoft.EntityFrameworkCore (9.0.9)** – Core EF ORM features.
+- **Microsoft.EntityFrameworkCore.Sqlite (9.0.9)** – SQLite provider for EF Core, used as the local database.
+- **Microsoft.EntityFrameworkCore.Tools (9.0.9)** – Tools for EF Core migrations and scaffolding.
+- **Octokit (14.0.0)** – Official GitHub API client for .NET.
+- **OpenAI (2.4.0)** – .NET client for interacting with the OpenAI API (used for AI-assisted code review and suggestions).
+
 
 ## 📂 Project Structure
 
@@ -105,25 +114,8 @@ dotnet tool install --global dotnet-ef
 dotnet user-secrets init
 dotnet user-secrets set "GitHub:Token" "<your-github-pat>"
 dotnet user-secrets set "OpenAI:ApiKey" "<your-openai-api-key>"
-dotnet user-secrets set "GitHub:Owner" "YourGitHubUsernameOrOrg"
 ```
 
-#### Option B – appsettings.json (⚠️ not for production)
-
-```json
-{
-  "GitHub": {
-    "Token": "your-github-token",
-    "Owner": "EduartHajko"
-  },
-  "OpenAI": {
-    "ApiKey": "your-openai-api-key"
-  },
-  "ConnectionStrings": {
-    "DefaultConnection": "Data Source=audits.db"
-  }
-}
-```
 
 ### 4. Database Migration
 
