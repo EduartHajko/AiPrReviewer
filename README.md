@@ -26,6 +26,18 @@ Audit logs are stored in a **local SQLite database** for full traceability.
     - Owner & repo info  
     - Timestamp  
 
+Feature: Author Evaluation
+
+- Added a **new menu tab**: **Authors**  
+- Select an author from a dropdown.  
+- The backend collects all their **audit log data** (review comments + committed code snippets).  
+- Sends them to **OpenAI** for analysis.  
+- AI produces a **performance evaluation report** including:
+  - Strengths
+  - Weaknesses
+  - Suggested improvements
+  - Recommended tutorials/courses for missing skills  
+- Report is displayed in the app and can be **exported to PDF**. 
 - 🖥️ **UI with ASP.NET Core MVC**  
   - Home dashboard with navigation to **Repositories**, **Pull Requests**, and **Audit Log**.  
   - Pull request detail page with comments, AI solve button, and commit action.  
@@ -115,7 +127,27 @@ dotnet user-secrets init
 dotnet user-secrets set "GitHub:Token" "<your-github-pat>"
 dotnet user-secrets set "OpenAI:ApiKey" "<your-openai-api-key>"
 ```
+## 📑 Example `appsettings.json` add the owner of the repository in the json file
 
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+
+  "GitHub": {
+    "Owner": "EduartHajko"
+  },
+
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=aiprreviewer.db"
+  }
+}
+```
 
 ### 4. Database Migration
 
@@ -126,6 +158,8 @@ dotnet ef database update
 
 This will create the local `audits.db` SQLite database.
 
+### 5. Database Seeds
+on startup it will sedd some data in the audit log table just for showing and analysis
 ---
 
 ## 🚀 Running the App
@@ -149,14 +183,6 @@ App will be available at:
 - **.gitignore**: `.json` files excluded from git to avoid leaking API keys.  
 - **Audit Trail**: Every AI commit is persisted for transparency.
 
----
-
-## 📈 Next Steps / Enhancements
-
-- 🔎 Diff view: Highlight AI changes vs original code.  
-- 📝 More granular audit: Track who applied the fix (local user).  
-- 🌐 Multi-repo support with dynamic switching.  
-- 📬 Email/Slack notifications for AI-applied fixes.  
 
 ---
 
