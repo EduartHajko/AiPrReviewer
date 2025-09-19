@@ -1,7 +1,8 @@
 # 🧑‍💻 AiPrReviewer
 
 AiPrReviewer is an **AI-powered assistant** for reviewing, fixing, and managing **GitHub Pull Requests**.  
-It integrates with **GitHub API** and **OpenAI GPT models** to automatically suggest and apply fixes based on reviewer comments.  
+It integrates with **GitHub API** and **OpenAI GPT models** to automatically suggest and apply fixes based on reviewer comments.
+Gives Evaluation for author of the prs based on the analysis oth the comments and code snippets
 Audit logs are stored in a **local SQLite database** for full traceability.
 
 ---
