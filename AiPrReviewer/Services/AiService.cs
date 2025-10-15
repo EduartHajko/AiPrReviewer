@@ -15,25 +15,29 @@ namespace AiPrReviewer.Services
         public async Task<string> SolveComment(string comment, string code)
         {
             var prompt = $"""
-        Reviewer comment: {comment}
+    Reviewer comment:
+    {comment}
 
-        Original code snippet:
-        ```
-        {code}
-        ```
+    Original code snippet:
+    ```
+    {code}
+    ```
 
-        ✅ Task: Apply ONLY the requested fix.
-        ⚠️ Output rules:
-        - Return ONLY the exact line(s) that must be changed or added.
-        - Do NOT repeat the full method or unrelated code.
-        - If no change is needed, reply with "NO CHANGE".
-        """;
+    🧠 Task:
+    Apply the reviewer’s requested changes to the provided code.
+
+    ⚙️ Output rules:
+    - Return the full, corrected code snippet if multiple changes or structural modifications are needed.
+    - If only a few lines must be modified, you may return just those updated lines.
+    - Do NOT include explanations, markdown formatting, or commentary.
+    - Preserve code style and indentation.
+    - If no changes are needed, reply with exactly: NO CHANGE
+    """;
 
             var response = await _chatClient.CompleteChatAsync(
-                [
-                    ChatMessage.CreateUserMessage(prompt)
-                ]
-            );
+            [
+                ChatMessage.CreateUserMessage(prompt)
+            ]);
 
             return response.Value.Content[0].Text.Trim();
         }
